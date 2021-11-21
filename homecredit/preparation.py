@@ -79,5 +79,24 @@ class Preparation:
             fig, ax = plt.subplots(figsize=(19, 7))
             sns.violinplot(x= catcol, y= numcol, hue = hue, split = split,  data = df_sample)
             sns.swarmplot(x= catcol, y= numcol, data=df_sample, color="White") ;
+            
+            
+    #Proportion Table for target variable
+    def targetVar(self, targ= "TARGET"):
+        
+        dataframe = (self.data[targ].value_counts() / len(self.data)).to_frame()
+           
+        fig, ax=plt.subplots(1,2,figsize=(14,4))
+
+        self.data[targ].value_counts().plot.pie(explode=[0.1,0.1],autopct='%1.1f%%',shadow=True,ax=ax[0])
+        ax[0].set_title("Target Entries %")
+        ax[0].set_ylabel('')
+
+        sns.countplot(x = targ, data = self.data, ax=ax[1])
+        ax[1].set_title('Count of Repayer Vs. defulter')
+
+        plt.show()
+        
+        return dataframe
         
         
