@@ -49,10 +49,10 @@ class Preparation:
         sns.barplot(y = "type", x = "freq", data = t, ax=ax[1])
         ax[1].set_title("Comparing percentages for "+str(col))
         
-    def plot_numcols_single(self, col, kde=True, bins=50): # col : col name
-        
+    def plot_numcols_single(self, col, kde=True, bins=50, nbr=1): # col : column name
+        """ nbr = 365 for temporal columns"""
         plt.figure(figsize = (10, 4))
-        sns.histplot(self.data[col], kde=kde, bins= bins);
+        sns.histplot(self.data[col]/nbr, kde=kde, bins= bins);
         
     def plot_num_cat_cols(self, numcol, catcol, sample = 1000, plot_type = 1, hue = "TARGET", split=True): #target variable
         
