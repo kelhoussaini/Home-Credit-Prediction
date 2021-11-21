@@ -2,7 +2,6 @@ import os
 import pandas as pd
 
 
-
 class HomeCredit:
 
     def get_data(self):
