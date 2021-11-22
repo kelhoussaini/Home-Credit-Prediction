@@ -58,6 +58,17 @@ class Cleaning:
         self.data = self.data[self.data['AMT_GOODS_PRICE'] < 2.5* 10**6]  
         self.data = self.data[self.data['OWN_CAR_AGE'] < 45]
         return self.data
+    
+    def remove_missvalues(self):
+        
+        df = self.remove_entries()
+        # Categorical Variables
+        df[self.catcols].fillna('', inplace=True)
+
+        # Replace the NaNs in numerical column by the mean of values
+        # in numerical column respectively
+        df[self.numcols] = self.data[self.numcols].fillna(value=df[self.numcols].mean())
+        return df
 
         
         
