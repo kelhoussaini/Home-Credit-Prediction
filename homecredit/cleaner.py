@@ -4,6 +4,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from homecredit.data import HomeCredit
+from homecredit.preparation import Preparation
+
     
     
 class Cleaning:
@@ -13,6 +15,8 @@ class Cleaning:
         sys.path.append(path_dir)
         # Assign an attribute ".data" to all new instances of Preparation
         self.data = HomeCredit().get_data()['train'].copy() # good practice to be sure not to modify your `data` variable
+        self.catcols = Preparation().get_catcols()
+        self.numcols = Preparation().get_numcols()
         
     def get_count_missvalues(self):
         missing_df = pd.DataFrame(self.data.isnull().sum().sort_values(ascending=False))
@@ -50,7 +54,9 @@ class Cleaning:
         self.data = self.data[self.data['NAME_FAMILY_STATUS'] != 'Unknown'] # 'Unknown' status
         # Remove entries with DAYS_EMPLOYED > 200_000
         self.data = self.data[self.data['DAYS_EMPLOYED'] < 200_000]
-        
+        self.data = self.data[self.data['AMT_ANNUITY'] < 150_000]
+        self.data = self.data[self.data['AMT_GOODS_PRICE'] < 2.5* 10**6]  
+        self.data = self.data[self.data['OWN_CAR_AGE'] < 45]
         return self.data
 
         
