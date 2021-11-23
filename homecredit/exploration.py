@@ -1,10 +1,16 @@
 import os
 import sys
 import pandas as pd
+import numpy as np
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 from homecredit.data import HomeCredit
 from homecredit.cleaner import Cleaning
+from homecredit.preparation import Preparation
+
+from scipy.stats import chi2_contingency # need this for chi-squared function
+
 
 
 class Exploration:
@@ -18,7 +24,7 @@ class Exploration:
         self.catcols = Preparation().get_catcols()
        
         
-    def plot_correlation(self, colname):
+    def plot_correlation(self):
     
         fig, ax = plt.subplots(figsize=(15, 10))
         sns.heatmap(self.data.corr(), cmap='coolwarm', annot = False, label = 'small', cbar = False)
@@ -34,7 +40,8 @@ class Exploration:
     
         return chisqt
     
-    def categ_relation(self, col1, col2, margins=False):
+    def categ_relation(self, col1:str, col2:str, margins=False):
+        #col1, col2 :Categorical Variables
         chisqt = pd.crosstab(self.data[col1], self.data[col2], margins=margins)
         value = chisqt.to_numpy() 
         
