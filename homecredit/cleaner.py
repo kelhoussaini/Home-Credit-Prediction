@@ -1,7 +1,10 @@
 import os
 import sys
 import pandas as pd
+import numpy as np
 import seaborn as sns
+import matplotlib.pyplot as plt
+
 from homecredit.data import HomeCredit
 from homecredit.preparation import Preparation
 
