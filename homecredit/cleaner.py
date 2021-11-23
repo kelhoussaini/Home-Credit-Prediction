@@ -58,7 +58,9 @@ class Cleaning:
         self.data = self.data[self.data['DAYS_EMPLOYED'] < 200_000]
         self.data = self.data[self.data['AMT_ANNUITY'] < 150_000]
         self.data = self.data[self.data['AMT_GOODS_PRICE'] < 2.5* 10**6]  
-        self.data = self.data[self.data['OWN_CAR_AGE'] < 45]
+        #self.data = self.data[self.data['OWN_CAR_AGE'] < 45]
+        # when removing data with CAR_AGE > 45, we got NaN value :
+        # cramers_val(self, col1, col2, margins=False), col1: FLAG_OWN_CAR and col2:all columns
         return self.data
     
     def remove_missvalues(self):
@@ -70,6 +72,7 @@ class Cleaning:
         # Replace the NaNs in numerical column by the mean of values
         # in numerical column respectively
         df[self.numcols] = self.data[self.numcols].fillna(value=df[self.numcols].mean())
+        # Also, we can remove these missing values
         return df
 
         
