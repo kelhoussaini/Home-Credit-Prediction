@@ -1,1 +1,5 @@
+Train data:
 https://www.kaggle.com/cloycebox/default-risk-exploration-cjp-and-friends/data?select=application_train.csv
+
+Test data:
+https://www.kaggle.com/cloycebox/default-risk-exploration-cjp-and-friends/data?select=application_test.csv
