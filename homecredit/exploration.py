@@ -24,9 +24,14 @@ class Exploration:
         if data_set == 'train':
             self.prep = Preparation(data_set, cols)
         else:
-            T = cols[:] #  [:] to keep the original list 'cols' unchanged
-            T.remove(targ)
+            if cols is None:
+                self.pr = Preparation(data_set, cols) # Target Var does not exist already
+                T = list(self.pr.data.columns)[:] #  [:] to keep the original list 'cols' unchanged
+            else:
+                T = cols[:]
+                T.remove(targ)
             self.prep = Preparation(data_set, T)
+            
             
         # Cleaning
         self.cl = Cleaning(data_set, cols)
