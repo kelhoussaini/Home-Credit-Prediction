@@ -17,25 +17,60 @@ class Encoder:
     
     """ Initialize dataframe
     """
-    def __init__(self, data_set = 'train'):
+    def __init__(self, data_set = 'train', cols = None, newdf = None, targ= "TARGET"):
+        
+        # cols : list that includes selected features & target variable
+        # with cols, we reduce the dataframe columns 
+        # and use it specially for depoying api
 
         path_dir = (os.path.dirname(os.getcwd()))
         sys.path.append(path_dir)
         # Assign an attribute ".data" to all new instances of Preparation
 
          # Preparation
-        self.prep = Preparation()
+        self.prep = Preparation(data_set, cols)
         
         # Cleaning
-        self.cl = Cleaning()
+        self.cl = Cleaning('train', cols, newdf, targ) 
+        
+        #print("cols", list(self.cl.data.columns))
         
         self.cl.prep.data_set = data_set
                 
-        self.data = self.cl.remove_missvalues() 
+        self.data = self.cl.remove_missvalues(set_df = 'train') 
+        
+        #print("list(self.data.columns) ", list(self.data.columns))
         
         # cleaning new data to predict
-        self.tt = Cleaning('test')
-        self.new_data = self.tt.remove_missvalues() 
+        
+        if newdf is None: # data to predict does not exist 
+            if cols is None: # && we consider all features
+                #print("here0 : --->", self.data.columns)
+                T = list(self.data.columns)[:]
+                #print("yes", T)
+                #T.remove(targ)
+                #self.tt = Cleaning('test', T)
+            else:   # selected features         
+                #print("here1")
+                T = cols[:] #  [:] to keep the original list 'cols' unchanged
+                #print("T    ", T)
+            #T.remove(targ)
+            #print("here2", T)
+            self.tt = Cleaning('train', T, newdf, targ)
+            self.new_data = self.tt.remove_missvalues(set_df = 'test') 
+        else:
+            #print("here2")
+            self.nn = Cleaning('train', cols, newdf)
+            #print("here2))", self.nn.__dict__.keys(), self.nn.data.shape, self.nn.newdata.shape)
+            self.new_data = self.nn.remove_missvalues(set_df = 'test') 
+            #print("here20", list(self.new_data.columns))
+            
+        
+        ##############  N.B  #############
+        #for the data to predict, we only make transformation
+        # without fitting, for this reason, we create a new instance of Cleaning() for test dataset
+        ##############  N.B (END) #############
+                
                  
         
     def execute(self, data_topredict=False): #new_data : we also need to encode/transform any data we want to predict 
