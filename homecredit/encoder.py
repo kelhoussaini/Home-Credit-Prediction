@@ -12,6 +12,7 @@ from homecredit.preparation import Preparation
 from homecredit.cleaner import Cleaning
 from homecredit.exploration import Exploration
 
+import pickle
 
 class Encoder:
     
@@ -79,6 +80,8 @@ class Encoder:
         df_new = self.new_data
         
         catcols = self.prep.get_catcols()
+        
+        results = []
         for col_name in catcols:
         
             #print(" ***** ")
@@ -137,6 +140,12 @@ class Encoder:
                 else:
                     data_res_new = data_res_new.drop(columns= col_name)
                     df_new = data_res_new
+                    
+                    
+            results.append({col_name : ohe})
+            
+        with open("encoder.pckl", "wb") as file:
+            pickle.dump(results, file) 
         
         return (df, df_new) if data_topredict else df
 
