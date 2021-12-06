@@ -25,9 +25,9 @@ jobs:
   # 🤖 CI paragraph
   #
   # uncomment the content of this paragraph to activate the tests in GitHub CI
-   - remove the 2 trailing characters "# ", do not change the spaces
-     (the `name` keys should be at the same level as the `uses` key)
-     (the `strategy` key should be at the same level as the `steps` key)
+  # - remove the 2 trailing characters "# ", do not change the spaces
+  #   (the `name` keys should be at the same level as the `uses` key)
+  #   (the `strategy` key should be at the same level as the `steps` key)
 
   build:
 
