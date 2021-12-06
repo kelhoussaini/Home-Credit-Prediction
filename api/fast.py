@@ -5,12 +5,10 @@ path_dir = (os.path.dirname(os.getcwd()))
 sys.path.append(path_dir)
 #print(path_dir)
 
-
 import pandas as pd
 
 from fastapi.middleware.cors import CORSMiddleware
 from homecredit.predict import Predict
-
 
 import pickle
 import time
