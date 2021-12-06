@@ -78,6 +78,11 @@ class Modeling:
             encoded_df_pred_sc = scaler.transform(self.new_data)
 
         res = (X_train_sc, X_test_sc, y_train, y_test)
+        
+        with open("scaler.pckl", "wb") as file:
+            pickle.dump(scaler, file) 
+            
+        
         return (res ,encoded_df_pred_sc) if data_topredict else res
        
         
@@ -87,16 +92,12 @@ class Modeling:
         
         #scoring = ['roc_auc', 'accuracy']
         
-        #models = []
-        results = []
+        
+        results = [] # #models = []
 
         # Classifiers
         #models.append(('LR', LogisticRegression(max_iter=1000)))
-        #models.append(('KNN', KNeighborsClassifier(n_neighbors=5)))
-        #models.append(('DTC', DecisionTreeClassifier()))
-        
-        #models.append(('RF', RandomForestClassifier()))
-        #models.append(('SVC', SVC()))
+        # ...
 
         filename  = ["all_features" if self.cols is None else "selected_features"][0]
         
@@ -156,6 +157,10 @@ class Modeling:
     def predict_newdata(self, best_model):
         
         ((X_train_sc, X_test_sc, y_train, y_test), encoded_df_pred_sc) = self.preprocess(data_topredict=True)
+        
+        # here, we fit the model before making prediction
+        # in homecredit/predict.py, we improve the predictions by creating a new class
+        # that allows to make prediction with a model (the best one && already fitted) 
         
         #= self.preprocess(data_topredict=True)[1]
         
