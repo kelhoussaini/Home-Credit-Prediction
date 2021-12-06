@@ -22,25 +22,37 @@ from homecredit.encoder import Encoder
 import pickle
 import time
 
+import shutil
+
 class Modeling:
     
-    def __init__(self, data_set = 'train'):
-            
+    def __init__(self, data_set = 'train', cols = None, newdf = None, targ= "TARGET"): # if newdf is None we get the two data sets in the 
+                                                                        # directory : test.csv and train.csv
         path_dir = (os.path.dirname(os.getcwd()))
         sys.path.append(path_dir)
         # Assign an attribute ".data" to all new instances of Preparation
 
          # Preparation
-        self.prep = Preparation()
+        #self.prep = Preparation(data_set, cols)    
+        
+        self.cols = cols
         
         # Cleaning
-        self.cl = Cleaning()
+        #self.cl = Cleaning(data_set, cols)
+
+        #self.cl.prep.data_set = data_set
         
-        self.cl.prep.data_set = data_set
+        #print("self.cl.prep.data_set    ")
         
-        self.en = Encoder()
-                
-        self.data = self.en.execute()              
+        self.en = Encoder(data_set, cols, newdf, targ= targ)#(data_set =data_set, cols = cols, newdf = newdf)
+                        
+        #print("self.en calling    ", self.en.data.shape, self.en.new_data.shape)
+        #(self.data, self.new_data) = self.en.execute(data_topredict=True)
+        self.data = self.en.execute(data_topredict=True)[0]
+        self.new_data = self.en.execute(data_topredict=True)[1]
+
+        #print("self.en execute    ")
+  
         
     def preprocess(self, VarTarg = 'TARGET', scaler = MinMaxScaler(), data_topredict=False): # we can here integrate scaler as arg
         
@@ -62,10 +74,15 @@ class Modeling:
         X_test_sc = scaler.transform(X_test)
         
         if data_topredict:
-            encoded_df_pred  = self.en.execute(data_topredict=True)[1]
-            encoded_df_pred_sc = scaler.transform(encoded_df_pred)
+            #encoded_df_pred  = self.en.execute(data_topredict=True)[1]
+            encoded_df_pred_sc = scaler.transform(self.new_data)
 
         res = (X_train_sc, X_test_sc, y_train, y_test)
+        
+        with open("scaler.pckl", "wb") as file:
+            pickle.dump(scaler, file) 
+            
+        
         return (res ,encoded_df_pred_sc) if data_topredict else res
        
         
@@ -75,18 +92,16 @@ class Modeling:
         
         #scoring = ['roc_auc', 'accuracy']
         
-        #models = []
-        results = []
+        
+        results = [] # #models = []
 
         # Classifiers
         #models.append(('LR', LogisticRegression(max_iter=1000)))
-        #models.append(('KNN', KNeighborsClassifier(n_neighbors=5)))
-        #models.append(('DTC', DecisionTreeClassifier()))
-        
-        #models.append(('RF', RandomForestClassifier()))
-        #models.append(('SVC', SVC()))
+        # ...
 
-        with open("models.pckl", "wb") as f:
+        filename  = ["all_features" if self.cols is None else "selected_features"][0]
+        
+        with open("models_"+filename+".pckl", "wb") as f:
             for name, model in models:
                 for s in scoring:
                     # start timer
@@ -106,11 +121,21 @@ class Modeling:
                     
             # Save the models
             #dictResults = {"Models": models, "Scoring":scoring, "Results": results}
-            pickle.dump(results, f)             
+            
+            pickle.dump(results, f) 
+        
+        #print(f.name)
+        #pathh = os.path.dirname(os.getcwd())
+        #print(pathh)
+        #target = f.name
+                    
+        #shutil.copyfile(f.name, target)
+
+        
          
         return results
     
-    def predict_test_score(self, best_model=LogisticRegression(max_iter=1000), best_scoring = 'accuracy'): # #scoring = ['roc_auc', 'accuracy']
+    def evaluate_model(self, best_model=LogisticRegression(max_iter=1000), best_scoring = 'accuracy'): # #scoring = ['roc_auc', 'accuracy']
         
         X_train_sc, X_test_sc, y_train, y_test = self.preprocess()
         
@@ -131,9 +156,13 @@ class Modeling:
     
     def predict_newdata(self, best_model):
         
-        X_train_sc, X_test_sc, y_train, y_test = self.preprocess(data_topredict=True)[0]
+        ((X_train_sc, X_test_sc, y_train, y_test), encoded_df_pred_sc) = self.preprocess(data_topredict=True)
         
-        encoded_df_pred_sc  = self.preprocess(data_topredict=True)[1]
+        # here, we fit the model before making prediction
+        # in homecredit/predict.py, we improve the predictions by creating a new class
+        # that allows to make prediction with a model (the best one && already fitted) 
+        
+        #= self.preprocess(data_topredict=True)[1]
         
         best_model.fit(X_train_sc, y_train)
         

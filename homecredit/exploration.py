@@ -15,27 +15,44 @@ from scipy.stats import chi2_contingency # need this for chi-squared function
 
 class Exploration:
        
-    def __init__(self, data_set = 'train'):
+    def __init__(self, data_set = 'train', cols = None, targ= "TARGET"):
          # Assign an attribute ".data" to all new instances of Preparation
         #self.data = HomeCredit().get_data()['train'].copy() # good practice to be sure not to modify your `data` variable
         
 
         # Preparation
-        self.prep = Preparation()
-        
+        if data_set == 'train':
+            self.prep = Preparation(data_set, cols)
+        else:
+            if cols is None:
+                self.pr = Preparation(data_set, cols) # Target Var does not exist already
+                T = list(self.pr.data.columns)[:] #  [:] to keep the original list 'cols' unchanged
+            else:
+                T = cols[:]
+                T.remove(targ)
+            self.prep = Preparation(data_set, T)
+            
+            
         # Cleaning
-        self.cl = Cleaning()
+        self.cl = Cleaning(data_set, cols)
         
         self.cl.prep.data_set = data_set
                 
-        self.data = self.cl.remove_missvalues()      
+        self.data = self.cl.remove_missvalues()         
+        
+        self.cols = cols
+        
+             
                 
-    def plot_correlation(self):
+    def plot_correlation(self, cbar = False):
         
         df = self.data#[self.data_set]
             
         fig, ax = plt.subplots(figsize=(15, 10))
-        sns.heatmap(df.corr(), cmap='coolwarm', annot = False, label = 'small', cbar = False)
+        if self.cols is None:
+            sns.heatmap(df.corr(), cmap='coolwarm', annot = False, label = 'small', cbar = cbar)
+        else:
+            sns.heatmap(df.corr(), cmap='coolwarm', annot = True, label = 'small', cbar = cbar)
         ax.set_title('Correlation Matrix')
         plt.show() ;
         
@@ -82,7 +99,7 @@ class Exploration:
         return V
     
     # Plot of Heatmap of Cramer's V
-    def plot_heatmapCramerV(self):
+    def plot_heatmapCramerV(self, cbar = False):
         
         catcols = self.prep.get_catcols()
         
@@ -95,7 +112,7 @@ class Exploration:
                 cramers_outputs[i,j] = result
                 
         fig = plt.figure(figsize = (8, 8))  # instanciate figure for heat map
-        ax = sns.heatmap(cramers_outputs, annot = True,  cmap = "BuPu", fmt=".0%", cbar = False)
+        ax = sns.heatmap(cramers_outputs, annot = True,  cmap = "BuPu", fmt=".0%", cbar = cbar)
         ax.set_xticklabels(catcols)
         ax.set_yticklabels(catcols)
         ax.tick_params(axis = 'x', labelrotation = 90)
