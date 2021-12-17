@@ -1,5 +1,5 @@
 # create the app in the EU region
-heroku create homecredit --ssh-git --region eu
+heroku create homecreditkenzael --ssh-git --region eu
 
 # you should see the origin remote for GitHub
 # and the heroku remote for Heroku
