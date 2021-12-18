@@ -2,6 +2,9 @@ import streamlit as st
 import requests
 import uvicorn
 
+from homecredit.predict import Predict
+
+
 from api.fast import app
 
 
@@ -19,7 +22,7 @@ import pandas as pd
 This front queries [Home Credit Default Risk API](http://127.0.0.1:8000/make_preds?CODE_GENDER=F&FLAG_OWN_CAR=N&OCCUPATION_TYPE=Laborers&NAME_INCOME_TYPE=Working&NAME_TYPE_SUITE=Family&EXT_SOURCE_3=0.5&DAYS_EMPLOYED=100&FLOORSMAX_AVG=0.3&DAYS_BIRTH=5000&REGION_RATING_CLIENT_W_CITY=2
 )
 '''
-
+print("test ok ")
 # Add a selectbox to the sidebar:
 CODE_GENDER = st.sidebar.selectbox(
     'CODE_GENDER',
@@ -64,10 +67,22 @@ params = dict(
         DAYS_BIRTH=DAYS_BIRTH,
         REGION_RATING_CLIENT_W_CITY=REGION_RATING_CLIENT_W_CITY) 
 
+
+DF = pd.DataFrame([params]) ##Build a dataframe for the prediction
+   
+#Call Predict() class that includes all the script needed for making predictions
+    
+pred = Predict(new_data = DF)
+        
+res = pred.execute() # with execute() method, we encode the new data based on
+                          # the encoding transformation used in the train data
+                          # then, we scaled the new encoded dataframe, and finally we use the model for prediction
+                          # which is also used in the training, so already fitted
+
 #uvicorn.run(app, host='127.0.0.1', port=8000, debug=True)
 
 # enter here the address of your initial api deployed to heroku , flask api
-url = f'http://0.0.0.0:8000/make_preds?CODE_GENDER={CODE_GENDER}&FLAG_OWN_CAR={FLAG_OWN_CAR}&OCCUPATION_TYPE={OCCUPATION_TYPE}&NAME_INCOME_TYPE={NAME_INCOME_TYPE}&NAME_TYPE_SUITE={NAME_TYPE_SUITE}&EXT_SOURCE_3={EXT_SOURCE_3}&DAYS_EMPLOYED={DAYS_EMPLOYED}&FLOORSMAX_AVG={FLOORSMAX_AVG}&DAYS_BIRTH={DAYS_BIRTH}&REGION_RATING_CLIENT_W_CITY={REGION_RATING_CLIENT_W_CITY}'
+#url = f'http://127.0.0.1:8000/make_preds?CODE_GENDER={CODE_GENDER}&FLAG_OWN_CAR={FLAG_OWN_CAR}&OCCUPATION_TYPE={OCCUPATION_TYPE}&NAME_INCOME_TYPE={NAME_INCOME_TYPE}&NAME_TYPE_SUITE={NAME_TYPE_SUITE}&EXT_SOURCE_3={EXT_SOURCE_3}&DAYS_EMPLOYED={DAYS_EMPLOYED}&FLOORSMAX_AVG={FLOORSMAX_AVG}&DAYS_BIRTH={DAYS_BIRTH}&REGION_RATING_CLIENT_W_CITY={REGION_RATING_CLIENT_W_CITY}'
 
 
 st.write('')
@@ -75,10 +90,11 @@ st.write('')
 
 
 if st.button('Predicted target'):
-    response = requests.get(url, params=params)
-    prediction = response.json()
+    response = res #requests.get(url, params=params)
+    print("response  :", response)
+    prediction = response#.json()
     col1, col2 = st.columns(2)
-    col2.metric("", f"{prediction['Prediction']}")
+    col2.metric("", prediction)#f"{prediction['Prediction']}")
 
 
 
