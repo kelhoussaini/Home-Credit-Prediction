@@ -34,4 +34,3 @@ six>=1.14
 #pickle
 #memoized-property
 #termcolor
-
